@@ -1,6 +1,7 @@
 package com.example.ginji.rssfeed;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.content.Context;
@@ -82,6 +83,12 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                                     int position, long id) {
                 int itemPosition = position;
                 Item itemValue = (Item) listView.getItemAtPosition(position);
+
+                Intent intent = new Intent(getActivity(), Detail.class);
+                intent.putExtra("List", (java.io.Serializable) listItem.get(position));
+                startActivity(intent);
+
+
                 System.out.println("Position :" + itemPosition + "  ListItem : " + itemValue.title);
             }
         });
@@ -111,6 +118,8 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
             }
         }, 5000);
     }
+
+
 
 
     // Uses AsyncTask to create a task away from the main UI thread. This task takes a
