@@ -1,0 +1,5 @@
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/text_news"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+    </TextView>
