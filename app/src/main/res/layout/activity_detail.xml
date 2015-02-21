@@ -17,6 +17,7 @@
         android:textSize="27sp"
         android:textStyle="bold"
         android:padding="10dp"
+        android:textColor="@color/red"
         android:layout_below="@+id/dateDetail"
 />
 
@@ -41,6 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/descDetail"
+        android:textSize="15sp"
         android:layout_below="@+id/titleDetail"
         />
 
