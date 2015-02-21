@@ -28,6 +28,7 @@ import com.example.ginji.rssfeed.Item;
 public class XmlParser {
 
     private static final String ns = null;
+    private String imglink = null;
 
     public List parse(InputStream in) throws XmlPullParserException, IOException {
         try {
@@ -104,7 +105,7 @@ public class XmlParser {
                 skip(parser);
             }
         }
-        return new Item(title, desc, date, link);
+        return new Item(title, desc, date, link, imglink);
     }
 
     // Processes title tags in the feed.
@@ -135,6 +136,7 @@ public class XmlParser {
         String tag = parser.getName();
 
         String url = parser.getAttributeValue(null, "url");
+        imglink = url;
         URL url_img = new URL(url);
         Bitmap image = BitmapFactory.decodeStream(url_img.openConnection().getInputStream());
         if (tag.equals("enclosure")) {

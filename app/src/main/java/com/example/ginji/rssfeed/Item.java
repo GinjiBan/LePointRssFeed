@@ -17,12 +17,14 @@ public class Item implements Serializable {
     private String desc;
     private Date date;
     private Bitmap pic;
+    private String imgLink;
 
-    public Item(String title, String desc, Date date, Bitmap pic) {
+    public Item(String title, String desc, Date date, Bitmap pic, String imgLink) {
         this.title = title;
         this.desc = desc;
         this.date = date;
         this.pic = pic;
+        this.imgLink = imgLink;
     }
 
     public String getTitle() {
@@ -55,5 +57,13 @@ public class Item implements Serializable {
 
     public void setPic(Bitmap pic) {
         this.pic = pic;
+    }
+
+    public String getImgLink() {
+        return imgLink;
+    }
+
+    public void setImgLink(String imgLink) {
+        this.imgLink = imgLink;
     }
 }

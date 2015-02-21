@@ -85,7 +85,10 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                 Item itemValue = (Item) listView.getItemAtPosition(position);
 
                 Intent intent = new Intent(getActivity(), Detail.class);
-                intent.putExtra("List", (java.io.Serializable) listItem.get(position));
+                intent.putExtra("title", listItem.get(position).getTitle());
+                intent.putExtra("date", listItem.get(position).getDate());
+                intent.putExtra("desc", listItem.get(position).getDesc());
+                intent.putExtra("pic", listItem.get(position).getImgLink());
                 startActivity(intent);
 
 
@@ -118,9 +121,6 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
             }
         }, 5000);
     }
-
-
-
 
     // Uses AsyncTask to create a task away from the main UI thread. This task takes a
     // URL string and uses it to create an HttpUrlConnection. Once the connection
