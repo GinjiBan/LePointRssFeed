@@ -89,7 +89,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                 startActivity(intent);
 
 
-                System.out.println("Position :" + itemPosition + "  ListItem : " + itemValue.title);
+                System.out.println("Position :" + itemPosition + "  title : " + itemValue.getTitle());
             }
         });
     }
@@ -187,7 +187,6 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         try {
             br = new BufferedReader(new InputStreamReader(is));
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
                 sb.append(line);
             }
         } catch (IOException e) {

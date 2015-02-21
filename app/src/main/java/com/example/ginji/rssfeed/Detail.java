@@ -19,7 +19,7 @@ public class Detail extends ActionBarActivity implements Serializable {
 
         //receive
         Item item = (Item) getIntent().getSerializableExtra("List");
-        System.out.println("Coucou : " + item.title);
+        System.out.println("Coucou : " + item.getTitle());
     }
 
 

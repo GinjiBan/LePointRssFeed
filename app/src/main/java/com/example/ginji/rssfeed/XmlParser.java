@@ -1,5 +1,7 @@
 package com.example.ginji.rssfeed;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Xml;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -10,7 +12,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.example.ginji.rssfeed.Item;
@@ -75,8 +82,9 @@ public class XmlParser {
     private Item readItem(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "item");
         String title = null;
-        String summary = null;
-        String link = null;
+        String desc = null;
+        Bitmap link = null;
+        Date date = null;
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
@@ -84,18 +92,19 @@ public class XmlParser {
             String name = parser.getName();
             if (name.equals("title")) {
                 title = readTitle(parser);
-                System.out.println(title);
-            }
-            /*else if (name.equals("summary")) {
-                summary = readSummary(parser);
-            } else if (name.equals("link")) {
+             }
+            else if (name.equals("description")) {
+                desc = readDesc(parser);
+            } else if (name.equals("pubDate")) {
+                date = readDate(parser);
+            } else if (name.equals("enclosure")) {
                 link = readLink(parser);
-            } */
+            }
             else {
                 skip(parser);
             }
         }
-        return new Item(title, null, null);
+        return new Item(title, desc, date, link);
     }
 
     // Processes title tags in the feed.
@@ -106,27 +115,40 @@ public class XmlParser {
         return title;
     }
 
-    // Processes link tags in the feed.
-    private String readLink(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String link = "";
-        parser.require(XmlPullParser.START_TAG, ns, "link");
-        String tag = parser.getName();
-        String relType = parser.getAttributeValue(null, "rel");
-        if (tag.equals("link")) {
-            if (relType.equals("alternate")) {
-                link = parser.getAttributeValue(null, "href");
-                parser.nextTag();
-            }
+    private Date readDate(XmlPullParser parser) throws IOException, XmlPullParserException {
+        parser.require(XmlPullParser.START_TAG, ns, "pubDate");
+        String toParse = readText(parser);
+        Date date = null;
+        SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM yyyy HH:mm:ss Z");
+        try {
+            date = formatter.parse(toParse);
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        parser.require(XmlPullParser.END_TAG, ns, "link");
-        return link;
+        parser.require(XmlPullParser.END_TAG, ns, "pubDate");
+        return date;
+    }
+
+    // Processes link tags in the feed.
+    private Bitmap readLink(XmlPullParser parser) throws IOException, XmlPullParserException {
+       parser.require(XmlPullParser.START_TAG, ns, "enclosure");
+        String tag = parser.getName();
+
+        String url = parser.getAttributeValue(null, "url");
+        URL url_img = new URL(url);
+        Bitmap image = BitmapFactory.decodeStream(url_img.openConnection().getInputStream());
+        if (tag.equals("enclosure")) {
+            parser.nextTag();
+        }
+        parser.require(XmlPullParser.END_TAG, ns, "enclosure");
+        return image;
     }
 
     // Processes summary tags in the feed.
-    private String readSummary(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, ns, "summary");
+    private String readDesc(XmlPullParser parser) throws IOException, XmlPullParserException {
+        parser.require(XmlPullParser.START_TAG, ns, "description");
         String summary = readText(parser);
-        parser.require(XmlPullParser.END_TAG, ns, "summary");
+        parser.require(XmlPullParser.END_TAG, ns, "description");
         return summary;
     }
 
@@ -156,6 +178,8 @@ public class XmlParser {
             }
         }
     }
+
+
 
     private static String getStringFromInputStream(InputStream is) {
         BufferedReader br = null;
