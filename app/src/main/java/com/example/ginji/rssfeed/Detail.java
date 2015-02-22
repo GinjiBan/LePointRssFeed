@@ -34,19 +34,38 @@ public class Detail extends ActionBarActivity implements Serializable {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-        String title = (String) getIntent().getSerializableExtra("title");
-        String pic = (String) getIntent().getSerializableExtra("pic");
-        String desc = (String) getIntent().getSerializableExtra("desc");
-        Date date = (Date) getIntent().getSerializableExtra("date");
         picView = (ImageView) findViewById(R.id.imgDetail);
         titleView = (TextView) findViewById(R.id.titleDetail);
         dateView = (TextView) findViewById(R.id.dateDetail);
         descView = (TextView) findViewById(R.id.descDetail);
-        // get Bitmap from URL in asyncTask
-        new getBigPic().execute(pic);
-        titleView.setText(title);
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM yyyy HH:mm:ss");
-        String time = formatter.format(date);
+        String title = null;
+        String pic = null;
+        String desc = null;
+        Date date = null;
+        String time = null;
+        int pos = -1;
+
+        pos = (int) getIntent().getIntExtra("pos", -1);
+        if (pos == -1) {
+            title = (String) getIntent().getSerializableExtra("title");
+            pic = (String) getIntent().getSerializableExtra("pic");
+            desc = (String) getIntent().getSerializableExtra("desc");
+            date = (Date) getIntent().getSerializableExtra("date");
+            new getBigPic().execute(pic);
+        }
+        else
+        {
+            NewsDAO news = new NewsDAO(this);
+            news.open();
+            title = news.getLivreWithTitre(pos + 1).getTitle();
+            Bitmap picture = news.getLivreWithTitre(pos + 1).getPic();
+            desc = news.getLivreWithTitre(pos + 1).getDesc();
+            date = news.getLivreWithTitre(pos + 1).getDate();
+            picView.setImageBitmap(picture);
+        }
+        time = formatter.format(date);
+        titleView.setText(title);
         dateView.setText("On " + time);
         descView.setText(desc);
     }

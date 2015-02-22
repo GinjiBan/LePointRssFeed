@@ -74,6 +74,36 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         return (mView);
     }
 
+    public void getDataFromDB()
+    {
+        System.out.println("No co");
+        NewsDAO news = new NewsDAO(mActivity);
+        news.open();
+        int i = 1;
+        Item tmp = null;
+        List tmpList = new ArrayList();
+        while ((tmp = news.getLivreWithTitre(i)) != null)
+        {
+            tmpList.add(tmp);
+            i++;
+        }
+        listItem = tmpList;
+        ItemAdapter adapter = (new ItemAdapter((Context) (this.getActivity()), (ArrayList) (listItem)));
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                int itemPosition = position;
+                Item itemValue = (Item) listView.getItemAtPosition(position);
+
+                Intent intent = new Intent(getActivity(), Detail.class);
+                intent.putExtra("pos", position);
+                startActivity(intent);
+            }
+        });
+    }
+
     public void addListItem() {
         ItemAdapter adapter = (new ItemAdapter((Context) (this.getActivity()), (ArrayList) (listItem)));
         listView.setAdapter(adapter);
@@ -110,8 +140,9 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                 mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            new DownloadWebpageTask().execute(stringUrl);
+           new DownloadWebpageTask().execute(stringUrl);
         } else {
+            getDataFromDB();
             textView.setText("No network connection available.");
         }
     }
@@ -146,8 +177,6 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
-
-
             addListItem();
         }
     }
