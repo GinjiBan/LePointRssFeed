@@ -77,6 +77,13 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
     public void addListItem() {
         ItemAdapter adapter = (new ItemAdapter((Context) (this.getActivity()), (ArrayList) (listItem)));
         listView.setAdapter(adapter);
+
+        NewsDAO news = new NewsDAO(mActivity);
+        news.open();
+        news.delete();
+        for (int i = 0; i < listItem.size(); i++)
+        news.insert(listItem.get(i));
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -90,10 +97,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                 intent.putExtra("desc", listItem.get(position).getDesc());
                 intent.putExtra("pic", listItem.get(position).getImgLink());
                 startActivity(intent);
-
-
-                System.out.println("Position :" + itemPosition + "  title : " + itemValue.getTitle());
-            }
+           }
         });
     }
 
@@ -142,6 +146,8 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
+
+
             addListItem();
         }
     }
