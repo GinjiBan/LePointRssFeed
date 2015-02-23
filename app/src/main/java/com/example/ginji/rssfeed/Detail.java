@@ -50,18 +50,14 @@ public class Detail extends ActionBarActivity implements Serializable {
         dateView = (TextView) findViewById(R.id.dateDetail);
         descView = (TextView) findViewById(R.id.descDetail);
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM yyyy HH:mm:ss");
-
         int pos = -1;
-
         if (savedInstanceState != null) {
-            System.out.println("I'm here");
             Item newItem = (Item) savedInstanceState.getSerializable("title");
             title = newItem.getTitle();
             desc = newItem.getDesc();
             date = newItem.getDate();
             picture = newItem.getPic();
             picView.setImageBitmap(picture);
-
         } else {
             pos = (int) getIntent().getIntExtra("pos", -1);
             if (pos == -1) {
@@ -73,10 +69,10 @@ public class Detail extends ActionBarActivity implements Serializable {
             } else {
                 NewsDAO news = new NewsDAO(this);
                 news.open();
-                title = news.getLivreWithTitre(pos + 1).getTitle();
-                picture = news.getLivreWithTitre(pos + 1).getPic();
-                desc = news.getLivreWithTitre(pos + 1).getDesc();
-                date = news.getLivreWithTitre(pos + 1).getDate();
+                title = news.getItemWithId(pos + 1).getTitle();
+                picture = news.getItemWithId(pos + 1).getPic();
+                desc = news.getItemWithId(pos + 1).getDesc();
+                date = news.getItemWithId(pos + 1).getDate();
                 picView.setImageBitmap(picture);
             }
 

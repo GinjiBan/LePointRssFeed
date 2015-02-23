@@ -24,7 +24,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     NEWS_PIC + " BLOB);";
     public static final String METIER_TABLE_DROP = "DROP TABLE IF EXISTS " + METIER_TABLE_NAME + ";";
 
-
     public DatabaseHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }

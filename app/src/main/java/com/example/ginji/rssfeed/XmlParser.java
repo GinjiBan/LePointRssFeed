@@ -68,7 +68,6 @@ public class XmlParser {
                 continue;
             }
             String name = parser.getName();
-            // Starts by looking for the entry tag
             if (name.equals("item")) {
                 entries.add(readItem(parser));
             } else {
@@ -78,7 +77,7 @@ public class XmlParser {
         return entries;
     }
 
-    // Parses the contents of an entry. If it encounters a title, summary, or link tag, hands them off
+    // Parses the contents of an item. If it encounters a title, desc, ..., hands them off
 // to their respective "read" methods for processing. Otherwise, skips the tag.
     private Item readItem(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "item");
@@ -106,7 +105,6 @@ public class XmlParser {
         return new Item(title, desc, date, link, imglink);
     }
 
-    // Processes title tags in the feed.
     private String readTitle(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "title");
         String title = readText(parser);
@@ -128,7 +126,6 @@ public class XmlParser {
         return date;
     }
 
-    // Processes link tags in the feed.
     private Bitmap readLink(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "enclosure");
         String tag = parser.getName();
@@ -144,7 +141,6 @@ public class XmlParser {
         return image;
     }
 
-    // Processes summary tags in the feed.
     private String readDesc(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "description");
         String summary = readText(parser);
@@ -152,7 +148,6 @@ public class XmlParser {
         return summary;
     }
 
-    // For the tags title and summary, extracts their text values.
     private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
         String result = "";
         if (parser.next() == XmlPullParser.TEXT) {
@@ -178,7 +173,6 @@ public class XmlParser {
             }
         }
     }
-
 
     private static String getStringFromInputStream(InputStream is) {
         BufferedReader br = null;

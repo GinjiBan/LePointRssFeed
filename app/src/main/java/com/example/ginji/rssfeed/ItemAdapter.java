@@ -27,9 +27,7 @@ public class ItemAdapter extends ArrayAdapter<Item> {
     public ItemAdapter(Context context, ArrayList<Item> items) {
         super(context, 0, items);
     }
-
     ImageView imageView = null;
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
@@ -38,14 +36,10 @@ public class ItemAdapter extends ArrayAdapter<Item> {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_items, parent, false);
         }
-        // Lookup view for data population
         TextView tvName = (TextView) convertView.findViewById(R.id.text_news);
         tvName.setText(item.getTitle());
-
         imageView = (ImageView) convertView.findViewById(R.id.img_news);
         imageView.setImageBitmap(item.getPic());
-
         return convertView;
     }
-
 }

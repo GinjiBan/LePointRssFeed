@@ -44,25 +44,14 @@ import java.util.List;
 public class NetworkFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
     private static final String DEBUG_TAG = "HttpExample";
     private static final String STRING_URL = "http://www.lepoint.fr/high-tech-internet/rss.xml";
-
     private View mView;
     private Activity mActivity;
-    private TextView textView;
-    private Button callUrl;
     private XmlParser parser = null;
     private List<Item> listItem = null;
     private ListView listView;
     private int i = 0;
     boolean isPressed = false;
-    boolean isResumed = false;
     SwipeRefreshLayout swipeLayout;
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        System.out.println("Je resume");
-        isResumed = true;
-    }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -77,24 +66,12 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_main, container, false);
-
-
         mActivity = getActivity();
         super.onCreate(savedInstanceState);
-        textView = (TextView) mView.findViewById(R.id.myText);
-        callUrl = (Button) mView.findViewById(R.id.urlButton);
         listView = (ListView) mView.findViewById(R.id.list_news);
-
         swipeLayout = (SwipeRefreshLayout) mView.findViewById(R.id.swipe_container);
         swipeLayout.setOnRefreshListener(this);
-        swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-
-        // callUrl.setOnClickListener(this);
         if (savedInstanceState != null) {
-//            System.out.println("I'am here !! size : " + listItem.size());
             Item test = null;
             List tmpList = new ArrayList();
             i = 0;
@@ -104,10 +81,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
             }
             listItem = tmpList;
         }
-        if (i != 0)
-        {
-            System.out.println("I = : " + i);
-
+        if (i != 0) {
             ItemAdapter adapter = (new ItemAdapter((Context) (this.getActivity()), (ArrayList) (listItem)));
             listView.setAdapter(adapter);
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -117,7 +91,6 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                     isPressed = true;
                     int itemPosition = position;
                     Item itemValue = (Item) listView.getItemAtPosition(position);
-
                     Intent intent = new Intent(getActivity(), Detail.class);
                     intent.putExtra("pos", position);
                     startActivity(intent);
@@ -128,12 +101,9 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                     mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isConnected()) {
-                System.out.println("J'ai De la co !");
                 new DownloadWebpageTask().execute(STRING_URL);
             } else {
-                System.out.println("J'ai pas de co");
                 getDataFromDB();
-                textView.setText("No network connection available.");
             }
         }
         return (mView);
@@ -145,7 +115,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         int i = 1;
         Item tmp = null;
         List tmpList = new ArrayList();
-        while ((tmp = news.getLivreWithTitre(i)) != null) {
+        while ((tmp = news.getItemWithId(i)) != null) {
             tmpList.add(tmp);
             i++;
         }
@@ -156,15 +126,16 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
+                /*
+                ** TODO : Check if co
+                */
                 isPressed = true;
                 int itemPosition = position;
                 Item itemValue = (Item) listView.getItemAtPosition(position);
-
                 Intent intent = new Intent(getActivity(), Detail.class);
                 intent.putExtra("pos", position);
                 startActivity(intent);
             }
-
         });
     }
 
@@ -173,22 +144,18 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
             return;
         ItemAdapter adapter = (new ItemAdapter((Context) (this.getActivity()), (ArrayList) (listItem)));
         listView.setAdapter(adapter);
-
         NewsDAO news = new NewsDAO(mActivity);
         news.open();
         news.delete();
         for (int i = 0; i < listItem.size(); i++)
             news.insert(listItem.get(i));
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 isPressed = true;
-
                 int itemPosition = position;
                 Item itemValue = (Item) listView.getItemAtPosition(position);
-
                 Intent intent = new Intent(getActivity(), Detail.class);
                 intent.putExtra("title", listItem.get(position).getTitle());
                 intent.putExtra("date", listItem.get(position).getDate());
@@ -197,13 +164,6 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                 startActivity(intent);
             }
         });
-    }
-
-    // When user clicks button, calls AsyncTask.
-    // Before attempting to fetch the URL, makes sure that there is a network connection.
-    public void onClick(View view) {
-        // Gets the URL from the UI's text field.
-
     }
 
     @Override
@@ -224,11 +184,14 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         }, 5000);
     }
 
+    @Override
+    public void onClick(View v) {
+
+    }
+
     // Uses AsyncTask to create a task away from the main UI thread. This task takes a
     // URL string and uses it to create an HttpUrlConnection. Once the connection
-    // has been established, the AsyncTask downloads the contents of the webpage as
-    // an InputStream. Finally, the InputStream is converted into a string, which is
-    // displayed in the UI by the AsyncTask's onPostExecute method.
+    // has been established, the AsyncTask downloads the contents of the webpage.
     private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
@@ -253,15 +216,13 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
 // a string.
     private String downloadUrl(String myurl) throws IOException {
         InputStream is = null;
-
         try {
             URL url = new URL(myurl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000000 /* milliseconds */);
+            conn.setReadTimeout(100000 /* milliseconds */);
             conn.setConnectTimeout(150000 /* milliseconds */);
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
-            // Starts the query
             conn.connect();
             int response = conn.getResponseCode();
             Log.d(DEBUG_TAG, "The response is: " + response);
@@ -273,37 +234,10 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                 e.printStackTrace();
             }
             return null;
-            // Makes sure that the InputStream is closed after the app is
-            // finished using it.
         } finally {
             if (is != null) {
                 is.close();
             }
         }
     }
-
-    private static String getStringFromInputStream(InputStream is) {
-        BufferedReader br = null;
-        StringBuilder sb = new StringBuilder();
-        String line;
-        try {
-            br = new BufferedReader(new InputStreamReader(is));
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return sb.toString();
-    }
-
-
 }
