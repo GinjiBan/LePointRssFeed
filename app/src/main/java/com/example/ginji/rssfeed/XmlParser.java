@@ -93,15 +93,13 @@ public class XmlParser {
             String name = parser.getName();
             if (name.equals("title")) {
                 title = readTitle(parser);
-             }
-            else if (name.equals("description")) {
+            } else if (name.equals("description")) {
                 desc = readDesc(parser);
             } else if (name.equals("pubDate")) {
                 date = readDate(parser);
             } else if (name.equals("enclosure")) {
                 link = readLink(parser);
-            }
-            else {
+            } else {
                 skip(parser);
             }
         }
@@ -132,7 +130,7 @@ public class XmlParser {
 
     // Processes link tags in the feed.
     private Bitmap readLink(XmlPullParser parser) throws IOException, XmlPullParserException {
-       parser.require(XmlPullParser.START_TAG, ns, "enclosure");
+        parser.require(XmlPullParser.START_TAG, ns, "enclosure");
         String tag = parser.getName();
 
         String url = parser.getAttributeValue(null, "url");
@@ -180,7 +178,6 @@ public class XmlParser {
             }
         }
     }
-
 
 
     private static String getStringFromInputStream(InputStream is) {

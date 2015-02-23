@@ -53,9 +53,7 @@ public class Detail extends ActionBarActivity implements Serializable {
             desc = (String) getIntent().getSerializableExtra("desc");
             date = (Date) getIntent().getSerializableExtra("date");
             new getBigPic().execute(pic);
-        }
-        else
-        {
+        } else {
             NewsDAO news = new NewsDAO(this);
             news.open();
             title = news.getLivreWithTitre(pos + 1).getTitle();

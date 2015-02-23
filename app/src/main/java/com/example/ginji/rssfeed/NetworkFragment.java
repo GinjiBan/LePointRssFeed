@@ -43,6 +43,8 @@ import java.util.List;
  */
 public class NetworkFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
     private static final String DEBUG_TAG = "HttpExample";
+    private static final String STRING_URL = "http://www.lepoint.fr/high-tech-internet/rss.xml";
+
     private View mView;
     private Activity mActivity;
     private TextView textView;
@@ -74,16 +76,14 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         return (mView);
     }
 
-    public void getDataFromDB()
-    {
+    public void getDataFromDB() {
         System.out.println("No co");
         NewsDAO news = new NewsDAO(mActivity);
         news.open();
         int i = 1;
         Item tmp = null;
         List tmpList = new ArrayList();
-        while ((tmp = news.getLivreWithTitre(i)) != null)
-        {
+        while ((tmp = news.getLivreWithTitre(i)) != null) {
             tmpList.add(tmp);
             i++;
         }
@@ -105,6 +105,8 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
     }
 
     public void addListItem() {
+        if (listItem == null)
+            return;
         ItemAdapter adapter = (new ItemAdapter((Context) (this.getActivity()), (ArrayList) (listItem)));
         listView.setAdapter(adapter);
 
@@ -112,7 +114,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         news.open();
         news.delete();
         for (int i = 0; i < listItem.size(); i++)
-        news.insert(listItem.get(i));
+            news.insert(listItem.get(i));
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -127,7 +129,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                 intent.putExtra("desc", listItem.get(position).getDesc());
                 intent.putExtra("pic", listItem.get(position).getImgLink());
                 startActivity(intent);
-           }
+            }
         });
     }
 
@@ -135,12 +137,11 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
     // Before attempting to fetch the URL, makes sure that there is a network connection.
     public void onClick(View view) {
         // Gets the URL from the UI's text field.
-        String stringUrl = "http://www.lepoint.fr/high-tech-internet/rss.xml";
         ConnectivityManager connMgr = (ConnectivityManager)
                 mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-           new DownloadWebpageTask().execute(stringUrl);
+            new DownloadWebpageTask().execute(STRING_URL);
         } else {
             getDataFromDB();
             textView.setText("No network connection available.");
@@ -152,7 +153,15 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                swipeLayout.setRefreshing(false);
+                ConnectivityManager connMgr = (ConnectivityManager)
+                        mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                if (networkInfo != null && networkInfo.isConnected()) {
+                    swipeLayout.setRefreshing(false);
+                    new DownloadWebpageTask().execute(STRING_URL);
+                } else {
+                    swipeLayout.setRefreshing(false);
+                }
             }
         }, 5000);
     }
