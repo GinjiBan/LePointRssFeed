@@ -139,16 +139,24 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         });
     }
 
+    private class fillDB extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            NewsDAO news = new NewsDAO(mActivity);
+            news.open();
+            news.delete();
+            for (int i = 0; i < listItem.size(); i++)
+                news.insert(listItem.get(i));
+            return null;
+        }
+    }
+
     public void addListItem() {
         if (listItem == null)
             return;
         ItemAdapter adapter = (new ItemAdapter((Context) (this.getActivity()), (ArrayList) (listItem)));
         listView.setAdapter(adapter);
-        NewsDAO news = new NewsDAO(mActivity);
-        news.open();
-        news.delete();
-        for (int i = 0; i < listItem.size(); i++)
-            news.insert(listItem.get(i));
+        new fillDB().execute();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,

@@ -27,7 +27,9 @@ public class ItemAdapter extends ArrayAdapter<Item> {
     public ItemAdapter(Context context, ArrayList<Item> items) {
         super(context, 0, items);
     }
+
     ImageView imageView = null;
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
