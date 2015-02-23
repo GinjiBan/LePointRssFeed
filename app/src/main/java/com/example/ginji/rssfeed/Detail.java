@@ -30,19 +30,6 @@ public class Detail extends ActionBarActivity implements Serializable {
     private Date date = null;
     private String time = null;
 
-
-    @Override
-    protected void onUserLeaveHint() {
-        picture = null;
-        super.onUserLeaveHint();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putSerializable("item", new Item(title, desc, date, picture, null));
-        super.onSaveInstanceState(savedInstanceState);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,30 +40,21 @@ public class Detail extends ActionBarActivity implements Serializable {
         descView = (TextView) findViewById(R.id.descDetail);
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM yyyy HH:mm:ss");
         int pos = -1;
-        if (savedInstanceState != null) {
-            Item newItem = (Item) savedInstanceState.getSerializable("item");
-            title = newItem.getTitle();
-            desc = newItem.getDesc();
-            date = newItem.getDate();
-            picture = newItem.getPic();
-            picView.setImageBitmap(picture);
+        pos = (int) getIntent().getIntExtra("pos", -1);
+        if (pos == -1) {
+            title = (String) getIntent().getSerializableExtra("title");
+            pic = (String) getIntent().getSerializableExtra("pic");
+            desc = (String) getIntent().getSerializableExtra("desc");
+            date = (Date) getIntent().getSerializableExtra("date");
+            new getBigPic().execute(pic);
         } else {
-            pos = (int) getIntent().getIntExtra("pos", -1);
-            if (pos == -1) {
-                title = (String) getIntent().getSerializableExtra("title");
-                pic = (String) getIntent().getSerializableExtra("pic");
-                desc = (String) getIntent().getSerializableExtra("desc");
-                date = (Date) getIntent().getSerializableExtra("date");
-                new getBigPic().execute(pic);
-            } else {
-                NewsDAO news = new NewsDAO(this);
-                news.open();
-                title = news.getItemWithId(pos + 1).getTitle();
-                picture = news.getItemWithId(pos + 1).getPic();
-                desc = news.getItemWithId(pos + 1).getDesc();
-                date = news.getItemWithId(pos + 1).getDate();
-                picView.setImageBitmap(picture);
-            }
+            NewsDAO news = new NewsDAO(this);
+            news.open();
+            title = news.getItemWithId(pos + 1).getTitle();
+            picture = news.getItemWithId(pos + 1).getPic();
+            desc = news.getItemWithId(pos + 1).getDesc();
+            date = news.getItemWithId(pos + 1).getDate();
+            picView.setImageBitmap(picture);
         }
         time = formatter.format(date);
         titleView.setText(title);

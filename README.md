@@ -26,10 +26,6 @@ You can get the description and the date of each articles by clicking on it
 
 ![alt tag](https://github.com/GinjiBan/LePointRssFeed/blob/master/pic/Detail.png)
 
-## Landscape
-
-Both view (main page and detail page) are working on landscape mode (**without re-feteching the datas**)
-
 ![alt tag](https://github.com/GinjiBan/LePointRssFeed/blob/master/pic/Detail_landscape.png)
 
 ## Database

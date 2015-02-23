@@ -41,23 +41,10 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
     boolean isPressed = false;
     SwipeRefreshLayout swipeLayout;
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        if (listItem != null && isPressed == false) {
-            for (int i = 0; i < listItem.size(); i++)
-                savedInstanceState.putSerializable(String.valueOf(i), listItem.get(i));
-        }
-        super.onSaveInstanceState(savedInstanceState);
-    }
-
-    public void setItem() {
-        if (isPressed == false)
-            listItem = null;
-    }
-
     public void addIntentCo(int position) {
         isPressed = true;
         Intent intent = new Intent(getActivity(), Detail.class);
+
         intent.putExtra("title", listItem.get(position).getTitle());
         intent.putExtra("date", listItem.get(position).getDate());
         intent.putExtra("desc", listItem.get(position).getDesc());
@@ -96,35 +83,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-        if (savedInstanceState != null) {
-            Item test = null;
-            List tmpList = new ArrayList();
-            i = 0;
-            while ((test = (Item) savedInstanceState.getSerializable(String.valueOf(i))) != null) {
-                tmpList.add(i, test);
-                i++;
-            }
-            listItem = tmpList;
-        }
-        if (i != 0) {
-            ItemAdapter adapter = (new ItemAdapter((Context) (this.getActivity()), (ArrayList) (listItem)));
-            listView.setAdapter(adapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view,
-                                        int position, long id) {
-                    ConnectivityManager connMgr = (ConnectivityManager)
-                            mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
-                    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                    if (networkInfo != null && networkInfo.isConnected()) {
-                        addIntentCo(position);
-                    } else {
-                        addIntentNoCo(position);
-                    }
-                }
-            });
-        } else
-            fetchData();
+        fetchData();
         return (mView);
     }
 
@@ -167,12 +126,12 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
     public void addListItem() {
         if (listItem == null)
             return;
+        new fillDB().execute();
         Context c = (Context) (this.getActivity());
         if (c == null)
             return;
         ItemAdapter adapter = (new ItemAdapter((Context) c, (ArrayList) (listItem)));
         listView.setAdapter(adapter);
-        new fillDB().execute();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
