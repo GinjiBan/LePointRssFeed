@@ -64,7 +64,6 @@ public class NewsDAO extends DAOBase {
         Item item = null;
         if (c.getCount() == 0)
             return null;
-
         c.moveToFirst();
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM yyyy HH:mm:ss");
         Bitmap bm = BitmapFactory.decodeByteArray(c.getBlob(4), 0, c.getBlob(4).length);

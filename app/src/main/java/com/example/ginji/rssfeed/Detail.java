@@ -1,24 +1,20 @@
 package com.example.ginji.rssfeed;
 
-import android.app.LauncherActivity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 
 public class Detail extends ActionBarActivity implements Serializable {
@@ -33,11 +29,10 @@ public class Detail extends ActionBarActivity implements Serializable {
     private String desc = null;
     private Date date = null;
     private String time = null;
-    private boolean isPressed = false;
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putSerializable("title", new Item(title, desc, date, picture, null));
+        savedInstanceState.putSerializable("item", new Item(title, desc, date, picture, null));
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -52,7 +47,7 @@ public class Detail extends ActionBarActivity implements Serializable {
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM yyyy HH:mm:ss");
         int pos = -1;
         if (savedInstanceState != null) {
-            Item newItem = (Item) savedInstanceState.getSerializable("title");
+            Item newItem = (Item) savedInstanceState.getSerializable("item");
             title = newItem.getTitle();
             desc = newItem.getDesc();
             date = newItem.getDate();
@@ -75,7 +70,6 @@ public class Detail extends ActionBarActivity implements Serializable {
                 date = news.getItemWithId(pos + 1).getDate();
                 picView.setImageBitmap(picture);
             }
-
         }
         time = formatter.format(date);
         titleView.setText(title);
