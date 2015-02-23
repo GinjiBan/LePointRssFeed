@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -51,9 +50,9 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         super.onSaveInstanceState(savedInstanceState);
     }
 
-    public void setItem()
-    {
-        listItem = null;
+    public void setItem() {
+        if (isPressed == false)
+            listItem = null;
     }
 
     public void addIntentCo(int position) {
@@ -157,8 +156,10 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
             NewsDAO news = new NewsDAO(mActivity);
             news.open();
             news.delete();
-            for (int i = 0; i < listItem.size(); i++)
-                news.insert(listItem.get(i));
+            if (listItem != null) {
+                for (int i = 0; i < listItem.size(); i++)
+                    news.insert(listItem.get(i));
+            }
             return null;
         }
     }
@@ -169,6 +170,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         ItemAdapter adapter = (new ItemAdapter((Context) (this.getActivity()), (ArrayList) (listItem)));
         listView.setAdapter(adapter);
         new fillDB().execute();
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
