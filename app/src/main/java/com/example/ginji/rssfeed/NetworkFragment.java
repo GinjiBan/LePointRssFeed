@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -48,6 +49,11 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                 savedInstanceState.putSerializable(String.valueOf(i), listItem.get(i));
         }
         super.onSaveInstanceState(savedInstanceState);
+    }
+
+    public void setItem()
+    {
+        listItem = null;
     }
 
     public void addIntentCo(int position) {

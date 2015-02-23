@@ -30,6 +30,14 @@ public class Detail extends ActionBarActivity implements Serializable {
     private Date date = null;
     private String time = null;
 
+
+    @Override
+    protected void onUserLeaveHint()
+    {
+       picture = null;
+       super.onUserLeaveHint();
+    }
+
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putSerializable("item", new Item(title, desc, date, picture, null));
