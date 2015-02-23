@@ -32,10 +32,9 @@ public class Detail extends ActionBarActivity implements Serializable {
 
 
     @Override
-    protected void onUserLeaveHint()
-    {
-       picture = null;
-       super.onUserLeaveHint();
+    protected void onUserLeaveHint() {
+        picture = null;
+        super.onUserLeaveHint();
     }
 
     @Override

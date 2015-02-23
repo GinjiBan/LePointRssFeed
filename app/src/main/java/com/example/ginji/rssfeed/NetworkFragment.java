@@ -167,10 +167,12 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
     public void addListItem() {
         if (listItem == null)
             return;
-        ItemAdapter adapter = (new ItemAdapter((Context) (this.getActivity()), (ArrayList) (listItem)));
+        Context c = (Context) (this.getActivity());
+        if (c == null)
+            return;
+        ItemAdapter adapter = (new ItemAdapter((Context) c, (ArrayList) (listItem)));
         listView.setAdapter(adapter);
         new fillDB().execute();
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
