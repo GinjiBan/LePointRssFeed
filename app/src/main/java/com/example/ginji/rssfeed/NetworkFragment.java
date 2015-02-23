@@ -50,6 +50,34 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         super.onSaveInstanceState(savedInstanceState);
     }
 
+    public void addIntentCo(int position) {
+        isPressed = true;
+        Intent intent = new Intent(getActivity(), Detail.class);
+        intent.putExtra("title", listItem.get(position).getTitle());
+        intent.putExtra("date", listItem.get(position).getDate());
+        intent.putExtra("desc", listItem.get(position).getDesc());
+        intent.putExtra("pic", listItem.get(position).getImgLink());
+        startActivity(intent);
+    }
+
+    public void addIntentNoCo(int position) {
+        isPressed = true;
+        Intent intent = new Intent(getActivity(), Detail.class);
+        intent.putExtra("pos", position);
+        startActivity(intent);
+    }
+
+    public void fetchData() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new DownloadWebpageTask().execute(STRING_URL);
+        } else {
+            getDataFromDB();
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -59,6 +87,10 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         listView = (ListView) mView.findViewById(R.id.list_news);
         swipeLayout = (SwipeRefreshLayout) mView.findViewById(R.id.swipe_container);
         swipeLayout.setOnRefreshListener(this);
+        swipeLayout.setColorScheme(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
         if (savedInstanceState != null) {
             Item test = null;
             List tmpList = new ArrayList();
@@ -76,24 +108,18 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
-                    isPressed = true;
-                    int itemPosition = position;
-                    Item itemValue = (Item) listView.getItemAtPosition(position);
-                    Intent intent = new Intent(getActivity(), Detail.class);
-                    intent.putExtra("pos", position);
-                    startActivity(intent);
+                    ConnectivityManager connMgr = (ConnectivityManager)
+                            mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+                    if (networkInfo != null && networkInfo.isConnected()) {
+                        addIntentCo(position);
+                    } else {
+                        addIntentNoCo(position);
+                    }
                 }
             });
-        } else {
-            ConnectivityManager connMgr = (ConnectivityManager)
-                    mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected()) {
-                new DownloadWebpageTask().execute(STRING_URL);
-            } else {
-                getDataFromDB();
-            }
-        }
+        } else
+            fetchData();
         return (mView);
     }
 
@@ -114,15 +140,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                /*
-                ** TODO : Check if co
-                */
-                isPressed = true;
-                int itemPosition = position;
-                Item itemValue = (Item) listView.getItemAtPosition(position);
-                Intent intent = new Intent(getActivity(), Detail.class);
-                intent.putExtra("pos", position);
-                startActivity(intent);
+                addIntentNoCo(position);
             }
         });
     }
@@ -149,15 +167,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                isPressed = true;
-                int itemPosition = position;
-                Item itemValue = (Item) listView.getItemAtPosition(position);
-                Intent intent = new Intent(getActivity(), Detail.class);
-                intent.putExtra("title", listItem.get(position).getTitle());
-                intent.putExtra("date", listItem.get(position).getDate());
-                intent.putExtra("desc", listItem.get(position).getDesc());
-                intent.putExtra("pic", listItem.get(position).getImgLink());
-                startActivity(intent);
+                addIntentCo(position);
             }
         });
     }
@@ -167,15 +177,8 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                ConnectivityManager connMgr = (ConnectivityManager)
-                        mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-                if (networkInfo != null && networkInfo.isConnected()) {
-                    swipeLayout.setRefreshing(false);
-                    new DownloadWebpageTask().execute(STRING_URL);
-                } else {
-                    swipeLayout.setRefreshing(false);
-                }
+                swipeLayout.setRefreshing(false);
+                fetchData();
             }
         }, 5000);
     }
