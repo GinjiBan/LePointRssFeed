@@ -50,14 +50,34 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
     private TextView textView;
     private Button callUrl;
     private XmlParser parser = null;
-    private List<Item> listItem;
+    private List<Item> listItem = null;
     private ListView listView;
+    private int i = 0;
+    boolean isPressed = false;
+    boolean isResumed = false;
     SwipeRefreshLayout swipeLayout;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        System.out.println("Je resume");
+        isResumed = true;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        if (listItem != null && isPressed == false) {
+            for (int i = 0; i < listItem.size(); i++)
+                savedInstanceState.putSerializable(String.valueOf(i), listItem.get(i));
+        }
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_main, container, false);
+
 
         mActivity = getActivity();
         super.onCreate(savedInstanceState);
@@ -72,12 +92,54 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        callUrl.setOnClickListener(this);
+        // callUrl.setOnClickListener(this);
+        if (savedInstanceState != null) {
+//            System.out.println("I'am here !! size : " + listItem.size());
+            Item test = null;
+            List tmpList = new ArrayList();
+            i = 0;
+            while ((test = (Item) savedInstanceState.getSerializable(String.valueOf(i))) != null) {
+                tmpList.add(i, test);
+                i++;
+            }
+            listItem = tmpList;
+        }
+        if (i != 0)
+        {
+            System.out.println("I = : " + i);
+
+            ItemAdapter adapter = (new ItemAdapter((Context) (this.getActivity()), (ArrayList) (listItem)));
+            listView.setAdapter(adapter);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view,
+                                        int position, long id) {
+                    isPressed = true;
+                    int itemPosition = position;
+                    Item itemValue = (Item) listView.getItemAtPosition(position);
+
+                    Intent intent = new Intent(getActivity(), Detail.class);
+                    intent.putExtra("pos", position);
+                    startActivity(intent);
+                }
+            });
+        } else {
+            ConnectivityManager connMgr = (ConnectivityManager)
+                    mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnected()) {
+                System.out.println("J'ai De la co !");
+                new DownloadWebpageTask().execute(STRING_URL);
+            } else {
+                System.out.println("J'ai pas de co");
+                getDataFromDB();
+                textView.setText("No network connection available.");
+            }
+        }
         return (mView);
     }
 
     public void getDataFromDB() {
-        System.out.println("No co");
         NewsDAO news = new NewsDAO(mActivity);
         news.open();
         int i = 1;
@@ -94,6 +156,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
+                isPressed = true;
                 int itemPosition = position;
                 Item itemValue = (Item) listView.getItemAtPosition(position);
 
@@ -101,6 +164,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
                 intent.putExtra("pos", position);
                 startActivity(intent);
             }
+
         });
     }
 
@@ -120,6 +184,8 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
+                isPressed = true;
+
                 int itemPosition = position;
                 Item itemValue = (Item) listView.getItemAtPosition(position);
 
@@ -137,15 +203,7 @@ public class NetworkFragment extends Fragment implements View.OnClickListener, S
     // Before attempting to fetch the URL, makes sure that there is a network connection.
     public void onClick(View view) {
         // Gets the URL from the UI's text field.
-        ConnectivityManager connMgr = (ConnectivityManager)
-                mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            new DownloadWebpageTask().execute(STRING_URL);
-        } else {
-            getDataFromDB();
-            textView.setText("No network connection available.");
-        }
+
     }
 
     @Override

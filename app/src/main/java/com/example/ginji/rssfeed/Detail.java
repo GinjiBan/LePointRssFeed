@@ -27,8 +27,19 @@ public class Detail extends ActionBarActivity implements Serializable {
     private TextView titleView;
     private TextView dateView;
     private TextView descView;
-    private Bitmap test = null;
+    private Bitmap picture = null;
+    private String title = null;
+    private String pic = null;
+    private String desc = null;
+    private Date date = null;
+    private String time = null;
+    private boolean isPressed = false;
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putSerializable("title", new Item(title, desc, date, picture, null));
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,28 +50,36 @@ public class Detail extends ActionBarActivity implements Serializable {
         dateView = (TextView) findViewById(R.id.dateDetail);
         descView = (TextView) findViewById(R.id.descDetail);
         SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM yyyy HH:mm:ss");
-        String title = null;
-        String pic = null;
-        String desc = null;
-        Date date = null;
-        String time = null;
+
         int pos = -1;
 
-        pos = (int) getIntent().getIntExtra("pos", -1);
-        if (pos == -1) {
-            title = (String) getIntent().getSerializableExtra("title");
-            pic = (String) getIntent().getSerializableExtra("pic");
-            desc = (String) getIntent().getSerializableExtra("desc");
-            date = (Date) getIntent().getSerializableExtra("date");
-            new getBigPic().execute(pic);
-        } else {
-            NewsDAO news = new NewsDAO(this);
-            news.open();
-            title = news.getLivreWithTitre(pos + 1).getTitle();
-            Bitmap picture = news.getLivreWithTitre(pos + 1).getPic();
-            desc = news.getLivreWithTitre(pos + 1).getDesc();
-            date = news.getLivreWithTitre(pos + 1).getDate();
+        if (savedInstanceState != null) {
+            System.out.println("I'm here");
+            Item newItem = (Item) savedInstanceState.getSerializable("title");
+            title = newItem.getTitle();
+            desc = newItem.getDesc();
+            date = newItem.getDate();
+            picture = newItem.getPic();
             picView.setImageBitmap(picture);
+
+        } else {
+            pos = (int) getIntent().getIntExtra("pos", -1);
+            if (pos == -1) {
+                title = (String) getIntent().getSerializableExtra("title");
+                pic = (String) getIntent().getSerializableExtra("pic");
+                desc = (String) getIntent().getSerializableExtra("desc");
+                date = (Date) getIntent().getSerializableExtra("date");
+                new getBigPic().execute(pic);
+            } else {
+                NewsDAO news = new NewsDAO(this);
+                news.open();
+                title = news.getLivreWithTitre(pos + 1).getTitle();
+                picture = news.getLivreWithTitre(pos + 1).getPic();
+                desc = news.getLivreWithTitre(pos + 1).getDesc();
+                date = news.getLivreWithTitre(pos + 1).getDate();
+                picView.setImageBitmap(picture);
+            }
+
         }
         time = formatter.format(date);
         titleView.setText(title);
@@ -85,6 +104,7 @@ public class Detail extends ActionBarActivity implements Serializable {
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(Bitmap result) {
+            picture = result;
             picView.setImageBitmap(result);
         }
     }
