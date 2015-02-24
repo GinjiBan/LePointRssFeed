@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
  * Created by Ginji on 22/02/2015.
  */
 public abstract class DAOBase {
-    protected final static int VERSION = 1;
+    protected final static int VERSION = 2;
     protected final static String NOM = "news.db";
     protected SQLiteDatabase mDb = null;
     protected DatabaseHandler mHandler = null;

@@ -10,10 +10,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -77,7 +74,7 @@ public class XmlParser {
         String title = null;
         String desc = null;
         Bitmap link = null;
-        Date date = null;
+        String date = null;
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
@@ -105,18 +102,12 @@ public class XmlParser {
         return title;
     }
 
-    private Date readDate(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private String readDate(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "pubDate");
         String toParse = readText(parser);
-        Date date = null;
-        SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM yyyy HH:mm:ss Z");
-        try {
-            date = formatter.parse(toParse);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        System.out.println("Date : " + toParse);
         parser.require(XmlPullParser.END_TAG, ns, "pubDate");
-        return date;
+        return toParse;
     }
 
     private Bitmap readLink(XmlPullParser parser) throws IOException, XmlPullParserException {

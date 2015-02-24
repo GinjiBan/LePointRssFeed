@@ -13,8 +13,6 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 public class Detail extends ActionBarActivity implements Serializable {
@@ -27,7 +25,6 @@ public class Detail extends ActionBarActivity implements Serializable {
     private String title = null;
     private String pic = null;
     private String desc = null;
-    private Date date = null;
     private String time = null;
 
     @Override
@@ -38,14 +35,13 @@ public class Detail extends ActionBarActivity implements Serializable {
         titleView = (TextView) findViewById(R.id.titleDetail);
         dateView = (TextView) findViewById(R.id.dateDetail);
         descView = (TextView) findViewById(R.id.descDetail);
-        SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM yyyy HH:mm:ss");
         int pos = -1;
         pos = (int) getIntent().getIntExtra("pos", -1);
         if (pos == -1) {
             title = (String) getIntent().getSerializableExtra("title");
             pic = (String) getIntent().getSerializableExtra("pic");
             desc = (String) getIntent().getSerializableExtra("desc");
-            date = (Date) getIntent().getSerializableExtra("date");
+            time = (String) getIntent().getSerializableExtra("date");
             new getBigPic().execute(pic);
         } else {
             NewsDAO news = new NewsDAO(this);
@@ -53,10 +49,9 @@ public class Detail extends ActionBarActivity implements Serializable {
             title = news.getItemWithId(pos + 1).getTitle();
             picture = news.getItemWithId(pos + 1).getPic();
             desc = news.getItemWithId(pos + 1).getDesc();
-            date = news.getItemWithId(pos + 1).getDate();
+            time = news.getItemWithId(pos + 1).getDate();
             picView.setImageBitmap(picture);
         }
-        time = formatter.format(date);
         titleView.setText(title);
         dateView.setText("On " + time);
         descView.setText(desc);
@@ -71,7 +66,6 @@ public class Detail extends ActionBarActivity implements Serializable {
                 URL url = new URL(urls[0]);
                 image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
             } catch (IOException e) {
-                //return "Unable to retrieve web page. URL may be invalid.";
             }
             return image;
         }

@@ -3,7 +3,6 @@ package com.example.ginji.rssfeed;
 import android.graphics.Bitmap;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Created by Ginji on 19/02/2015.
@@ -11,11 +10,11 @@ import java.util.Date;
 public class Item implements Serializable {
     private String title;
     private String desc;
-    private Date date;
+    private String date;
     private Bitmap pic;
     private String imgLink;
 
-    public Item(String title, String desc, Date date, Bitmap pic, String imgLink) {
+    public Item(String title, String desc, String date, Bitmap pic, String imgLink) {
         this.title = title;
         this.desc = desc;
         this.date = date;
@@ -39,11 +38,11 @@ public class Item implements Serializable {
         this.desc = desc;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

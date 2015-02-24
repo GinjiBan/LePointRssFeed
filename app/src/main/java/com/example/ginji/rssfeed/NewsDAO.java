@@ -7,8 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import java.io.ByteArrayOutputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 /**
  * Created by Ginji on 22/02/2015.
@@ -33,8 +31,7 @@ public class NewsDAO extends DAOBase {
         ContentValues value = new ContentValues();
         value.put(NewsDAO.NEWS_TITLE, m.getTitle());
         value.put(NewsDAO.NEWS_DESC, m.getDesc());
-        SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM yyyy HH:mm:ss");
-        value.put(NewsDAO.NEWS_DATE, formatter.format(m.getDate()));
+        value.put(NewsDAO.NEWS_DATE, m.getDate());
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         m.getPic().compress(Bitmap.CompressFormat.PNG, 100, bos);
         byte[] bArray = bos.toByteArray();
@@ -65,13 +62,8 @@ public class NewsDAO extends DAOBase {
         if (c.getCount() == 0)
             return null;
         c.moveToFirst();
-        SimpleDateFormat formatter = new SimpleDateFormat("EEEE, dd MMM yyyy HH:mm:ss");
         Bitmap bm = BitmapFactory.decodeByteArray(c.getBlob(4), 0, c.getBlob(4).length);
-        try {
-            item = new Item(c.getString(1), c.getString(2), formatter.parse(c.getString(3)), bm, null);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        item = new Item(c.getString(1), c.getString(2), c.getString(3), bm, null);
         c.close();
         return item;
     }
